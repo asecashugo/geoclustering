@@ -13,20 +13,13 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
+          cache: 'pipenv'
 
       - name: Install Pipenv
         run: pip install pipenv
 
       - name: Install dependencies
         run: pipenv install
-
-      - name: Cache Pipenv dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.local/share/virtualenvs
-          key: ${{ runner.os }}-pipenv-${{ hashFiles('Pipfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pipenv-
 
       - name: Run tests
         run: pipenv run pytest
