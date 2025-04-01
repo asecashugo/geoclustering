@@ -7,3 +7,5 @@ fig=plot_clusters(points_gdf)
 import os
 os.makedirs("output", exist_ok=True)
 fig.write_html("output/clustered_points.html")
+# assert that output file exists
+assert os.path.exists("output/clustered_points.html")
