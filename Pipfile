@@ -7,6 +7,8 @@ name = "pypi"
 pandas = "*"
 scikit-learn = "*"
 geopandas = "*"
+matplotlib = "*"
+mapbox = "*"
 
 [dev-packages]
 ipykernel = "*"
