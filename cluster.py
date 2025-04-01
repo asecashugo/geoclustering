@@ -27,7 +27,7 @@ def cluster(gdf:GeoDataFrame,n_clusters:int) -> GeoDataFrame:
 
     return gdf
 
-def plot_clusters(gdf:GeoDataFrame):
+def plot_clusters(gdf:GeoDataFrame) -> px.Figure:
     """
     Plot the clusters in the GeoDataFrame.
 
