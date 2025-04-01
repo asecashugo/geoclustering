@@ -10,11 +10,11 @@ geopandas = "*"
 matplotlib = "*"
 plotly = "*"
 mapbox = "*"
+pytest = "*"
 
 [dev-packages]
 ipykernel = "*"
 jupyter = "*"
-pytest = "*"
 
 [requires]
 python_version = "3.11"

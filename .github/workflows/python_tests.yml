@@ -14,6 +14,12 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Install Pipenv
+        run: pip install pipenv
+
+      - name: Install dependencies
+        run: pipenv install
+
       - name: Cache Pipenv dependencies
         uses: actions/cache@v3
         with:
@@ -21,12 +27,6 @@ jobs:
           key: ${{ runner.os }}-pipenv-${{ hashFiles('Pipfile.lock') }}
           restore-keys: |
             ${{ runner.os }}-pipenv-
-
-      - name: Install Pipenv
-        run: pip install pipenv
-
-      - name: Install dependencies
-        run: pipenv install --dev
 
       - name: Run tests
         run: pipenv run pytest
