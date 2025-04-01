@@ -8,6 +8,7 @@ pandas = "*"
 scikit-learn = "*"
 geopandas = "*"
 matplotlib = "*"
+plotly = "*"
 mapbox = "*"
 
 [dev-packages]
