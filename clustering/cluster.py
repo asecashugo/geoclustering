@@ -28,28 +28,6 @@ def cluster(gdf:GeoDataFrame,n_clusters:int) -> GeoDataFrame:
 
     return gdf
 
-# def plot_clusters(gdf:GeoDataFrame) -> go.Figure:
-#     """
-#     Plot the clusters in the GeoDataFrame.
-
-#     Args:
-#         gdf (GeoDataFrame): The input GeoDataFrame containing the points and their cluster labels.
-#     """
-
-#     gdf["lon"] = gdf.geometry.x
-#     gdf["lat"] = gdf.geometry.y
-    
-#     fig = go.Scattermap(
-#         gdf,
-#         lat="lat",
-#         lon="lon",
-#         zoom=10,
-#         mapbox_style="open-street-map",
-#         color="cluster",
-#     )
-
-#     return fig
-
 def plot_clusters(gdf: GeoDataFrame) -> go.Figure:
     gdf["lon"] = gdf.geometry.x
     gdf["lat"] = gdf.geometry.y
