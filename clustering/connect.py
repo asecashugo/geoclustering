@@ -2,8 +2,9 @@ from geopandas import GeoDataFrame
 import numpy as np
 import itertools
 import copy
-from shapely.geometry import Point
+from shapely.geometry import Point, Polygon
 import plotly.graph_objects as go
+from scipy.spatial import Voronoi
 
 def get_cost_matrix(gdf: GeoDataFrame) -> np.ndarray:
     """
@@ -204,6 +205,27 @@ def get_path_index(from_index:int,to_index:int,paths_gdf:GeoDataFrame) -> int:
         else:
             raise ValueError(f'Path from {from_index} to {to_index} not found in paths_gdf') 
 
+def calculate_voronoi_polygons(gdf: GeoDataFrame, convex_hull: Polygon) -> GeoDataFrame:
+    """
+    Calculate Voronoi polygons for each point within the convex hull.
+    """
+    coords = np.array(list(zip(gdf.geometry.x, gdf.geometry.y)))
+    vor = Voronoi(coords)
+    polygons = []
+
+    for region_index in vor.point_region:
+        vertices = vor.regions[region_index]
+        if -1 not in vertices:  # Ignore infinite regions
+            polygon = Polygon([vor.vertices[i] for i in vertices])
+            if polygon.intersects(convex_hull):
+                polygons.append(polygon.intersection(convex_hull))
+            else:
+                polygons.append(None)
+        else:
+            polygons.append(None)
+
+    gdf['voronoi'] = polygons
+    return gdf
 
 def get_centroids_and_trees(gdf: GeoDataFrame, bonus_factor:float=0.95):
         
@@ -397,6 +419,60 @@ def get_centroids_and_trees(gdf: GeoDataFrame, bonus_factor:float=0.95):
                     )
                 )
                 showlegend = False
+
+    # Calculate the convex hull of all points
+    print("Calculating convex hull...")
+    convex_hull = gdf.unary_union.convex_hull
+
+    # Ensure the convex hull is a Polygon
+    if convex_hull.geom_type == "Point" or convex_hull.geom_type == "MultiPoint":
+        # Create a small buffer around the point(s) to form a polygon
+        convex_hull = convex_hull.buffer(0.001)
+
+    # Add the convex hull to the figure
+    fig.add_trace(
+        go.Scattermapbox(
+            lon=[coord[0] for coord in convex_hull.exterior.coords],
+            lat=[coord[1] for coord in convex_hull.exterior.coords],
+            mode="lines",
+            fill="toself",
+            fillcolor="rgba(128, 128, 128, 0.3)",  # Transparent gray
+            line=dict(width=0),
+            name="Area",
+            showlegend=True,
+        )
+    )
+
+    # Calculate Voronoi polygons
+    print("Calculating Voronoi polygons...")
+    gdf = calculate_voronoi_polygons(gdf, convex_hull)
+
+    # Combine Voronoi polygons for each cluster
+    for cluster_id in clusters_gdf.index:
+        cluster_points = gdf[gdf["cluster"] == cluster_id]
+        cluster_voronoi = cluster_points.unary_union
+        clusters_gdf.at[cluster_id, "voronoi"] = cluster_voronoi
+
+        # Add the cluster Voronoi polygon to the figure
+        if cluster_voronoi and cluster_voronoi.geom_type in ["Polygon", "MultiPolygon"]:
+            if cluster_voronoi.geom_type == "Polygon":
+                polygons = [cluster_voronoi]
+            else:  # MultiPolygon
+                polygons = list(cluster_voronoi)
+
+            for polygon in polygons:
+                fig.add_trace(
+                    go.Scattermapbox(
+                        lon=[coord[0] for coord in polygon.exterior.coords],
+                        lat=[coord[1] for coord in polygon.exterior.coords],
+                        mode="lines",
+                        fill="toself",
+                        fillcolor=f"hsl({cluster_id * 360 / len(clusters_gdf)}, 70%, 50%)",
+                        line=dict(width=0),
+                        name=f"Cluster {cluster_id} Voronoi",
+                        showlegend=False,
+                    )
+                )
 
     # Update the layout for the Mapbox figure
     fig.update_layout(
