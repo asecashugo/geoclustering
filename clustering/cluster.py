@@ -20,8 +20,8 @@ def cluster(gdf:GeoDataFrame,n_clusters:int) -> GeoDataFrame:
     # Extract coordinates from the geometry column
     coords = np.array(list(zip(gdf.geometry.x, gdf.geometry.y)))
 
-    # Perform KMeans clustering
-    kmeans = KMeans(n_clusters=n_clusters, random_state=0).fit(coords)
+    # Perform KMeans clustering with increased iterations and initializations
+    kmeans = KMeans(n_clusters=n_clusters, random_state=0, max_iter=500, n_init=20).fit(coords)
     
     # Create a new column in the GeoDataFrame for the cluster labels
     gdf['cluster'] = kmeans.labels_

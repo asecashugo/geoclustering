@@ -447,18 +447,18 @@ def get_centroids_and_trees(gdf: GeoDataFrame, bonus_factor:float=0.95):
     print("Calculating Voronoi polygons...")
     gdf = calculate_voronoi_polygons(gdf, convex_hull)
 
-    # Combine Voronoi polygons for each cluster
+    # Combine convex hulls for each cluster
     for cluster_id in clusters_gdf.index:
         cluster_points = gdf[gdf["cluster"] == cluster_id]
-        cluster_voronoi = cluster_points.unary_union
-        clusters_gdf.at[cluster_id, "voronoi"] = cluster_voronoi
+        cluster_convex_hull = cluster_points.unary_union.convex_hull
+        clusters_gdf.at[cluster_id, "voronoi"] = cluster_convex_hull  # Replace 'voronoi' with convex hull
 
-        # Add the cluster Voronoi polygon to the figure
-        if cluster_voronoi and cluster_voronoi.geom_type in ["Polygon", "MultiPolygon"]:
-            if cluster_voronoi.geom_type == "Polygon":
-                polygons = [cluster_voronoi]
+        # Add the cluster convex hull to the figure
+        if cluster_convex_hull and cluster_convex_hull.geom_type in ["Polygon", "MultiPolygon"]:
+            if cluster_convex_hull.geom_type == "Polygon":
+                polygons = [cluster_convex_hull]
             else:  # MultiPolygon
-                polygons = list(cluster_voronoi)
+                polygons = list(cluster_convex_hull)
 
             for polygon in polygons:
                 fig.add_trace(
@@ -467,10 +467,13 @@ def get_centroids_and_trees(gdf: GeoDataFrame, bonus_factor:float=0.95):
                         lat=[coord[1] for coord in polygon.exterior.coords],
                         mode="lines",
                         fill="toself",
-                        fillcolor=f"hsl({cluster_id * 360 / len(clusters_gdf)}, 70%, 50%)",
+                        # fillcolor=f"hsl({cluster_id * 360 / len(clusters_gdf)}, 70%, 50%)",
+                        # use color above but with transparency
+                        fillcolor=f"hsla({cluster_id * 360 / len(clusters_gdf)}, 70%, 50%, 0.3)",
                         line=dict(width=0),
-                        name=f"Cluster {cluster_id} Voronoi",
+                        name=f"Cluster {cluster_id} Convex Hull",
                         showlegend=False,
+                        legendgroup=f"Cluster {cluster_id}",
                     )
                 )
 
@@ -486,6 +489,9 @@ def get_centroids_and_trees(gdf: GeoDataFrame, bonus_factor:float=0.95):
         ),
         margin=dict(l=0, r=0, t=0, b=0),
     )
+
+    # Set the mapbox style to "carto-positron"
+    fig.update_layout(mapbox_style="carto-positron")
 
     # Return clusters_gdf, paths_gdf, and the figure
     return clusters_gdf, paths_gdf, fig
