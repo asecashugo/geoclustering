@@ -3,6 +3,7 @@ import numpy as np
 import itertools
 import copy
 from shapely.geometry import Point
+import plotly.graph_objects as go
 
 def get_cost_matrix(gdf: GeoDataFrame) -> np.ndarray:
     """
@@ -209,10 +210,11 @@ def get_centroids_and_trees(gdf: GeoDataFrame, bonus_factor:float=0.95):
     n_nodes=gdf['cluster'].nunique()
     
     # CALCULATE COST MATRIX
+    print('Calculating cost matrix...')
     cost_matrix=get_cost_matrix(gdf)
     
     # CREATE PATHS DATAFRAME
-    print('Creating paths dataframe...')
+    print('Triangulating...')
     paths_gdf=delaunay_triangulation(gdf)
     paths_gdf['cluster_by_cost_selected']=-1
     paths_gdf['cluster_by_cost_selected_count']=0
@@ -368,11 +370,48 @@ def get_centroids_and_trees(gdf: GeoDataFrame, bonus_factor:float=0.95):
 
     # check length of trees
     if len(paths_gdf[paths_gdf.cluster_by_cost_selected!=-1])==len(gdf)-n_nodes:
-        print(f'Count OK: {len(paths_gdf[paths_gdf.cluster_by_cost_selected!=0])} paths for {len(gdf)-1} points in {n_nodes} nodes')
+        print(f'Count OK: {len(paths_gdf[paths_gdf.cluster_by_cost_selected!=-1])} paths for {len(gdf)-1} points in {n_nodes} nodes')
     else:
-        print(f'⚠️ Count NOT OK: {len(paths_gdf[paths_gdf.cluster_by_cost_selected!=0])} paths for {len(gdf)-1} points in {n_nodes} nodes')
+        print(f'⚠️ Count NOT OK: {len(paths_gdf[paths_gdf.cluster_by_cost_selected!=-1])} paths for {len(gdf)-1} points in {n_nodes} nodes')
     
-    return clusters_gdf, paths_gdf # TODO add figures
+    # Create a Mapbox figure
+    fig = go.Figure()
 
-        
-        
+    # Add line elements for each cluster with a different color
+    # for cluster_id, cluster_df in clusters_gdf.groupby("cluster"):
+    for cluster_id  in clusters_gdf.index:
+        cluster_paths = paths_gdf[paths_gdf["cluster"] == cluster_id]
+        showlegend = True
+        for _, path in cluster_paths.iterrows():
+            if path["cluster_by_cost_selected_count"] > 0:
+                line_coords = list(path.geometry.coords)
+                fig.add_trace(
+                    go.Scattermapbox(
+                        lon=[coord[0] for coord in line_coords],
+                        lat=[coord[1] for coord in line_coords],
+                        mode="lines",
+                        line=dict(width=int(path["cluster_by_cost_selected_count"]**0.5), color=f"hsl({cluster_id * 360 / len(clusters_gdf)}, 70%, 50%)"),
+                        name=f"Cluster {cluster_id}",
+                        legendgroup=f"Cluster {cluster_id}",
+                        showlegend=showlegend
+                    )
+                )
+                showlegend = False
+
+    # Update the layout for the Mapbox figure
+    fig.update_layout(
+        mapbox=dict(
+            style="open-street-map",
+            zoom=10,
+            center=dict(
+                lat=gdf.geometry.y.mean(),
+                lon=gdf.geometry.x.mean(),
+            ),
+        ),
+        margin=dict(l=0, r=0, t=0, b=0),
+    )
+
+    # Return clusters_gdf, paths_gdf, and the figure
+    return clusters_gdf, paths_gdf, fig
+
+
