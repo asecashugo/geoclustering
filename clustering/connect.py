@@ -379,17 +379,6 @@ def get_centroids_and_trees(gdf: GeoDataFrame, bonus_factor:float=0.95):
         print(f'  Centroid for cluster {cluster} is {centroid_index} with cost {min_cost:.2f}')
         centroids.append(centroid_index)
 
-        # write other important technical parameters for node
-        # get total power
-        # node_to_site_power_ratio_pu=n_cluster_points/self.n_wtgs
-        # self.nodes_df.at[cluster,'wind_el_p_mw']=node_to_site_power_ratio_pu*self.wind_nom_p_gw*1000
-        # self.nodes_df.at[cluster,'ren_p_mw']=node_to_site_power_ratio_pu*self.ren_nom_p_gw*1000
-        # self.nodes_df.at[cluster,'pv_el_p_mw']=node_to_site_power_ratio_pu*self.pv_nom_p_gw*1000
-        # self.nodes_df.at[cluster,'stack_p_mw']=node_to_site_power_ratio_pu*self.stack_nom_p_gw*1000
-
-    # set node numbers from index in self.nodes_df
-    # self.nodes_df['number']=self.nodes_df.index
-
     # check length of trees
     if len(paths_gdf[paths_gdf.cluster_by_cost_selected!=-1])==len(gdf)-n_nodes:
         print(f'Count OK: {len(paths_gdf[paths_gdf.cluster_by_cost_selected!=-1])} paths for {len(gdf)-1} points in {n_nodes} nodes')
@@ -412,7 +401,7 @@ def get_centroids_and_trees(gdf: GeoDataFrame, bonus_factor:float=0.95):
                         lon=[coord[0] for coord in line_coords],
                         lat=[coord[1] for coord in line_coords],
                         mode="lines",
-                        line=dict(width=int(path["cluster_by_cost_selected_count"]**0.5), color=f"hsl({cluster_id * 360 / len(clusters_gdf)}, 70%, 50%)"),
+                        line=dict(width=int(path["cluster_by_cost_selected_count"]**0.3), color=f"hsl({cluster_id * 360 / len(clusters_gdf)}, 70%, 50%)"),
                         name=f"Cluster {cluster_id}",
                         legendgroup=f"Cluster {cluster_id}",
                         showlegend=showlegend
@@ -473,15 +462,43 @@ def get_centroids_and_trees(gdf: GeoDataFrame, bonus_factor:float=0.95):
                         line=dict(width=0),
                         name=f"Cluster {cluster_id} Convex Hull",
                         showlegend=False,
-                        legendgroup=f"Cluster {cluster_id}",
+                        legendgroup="Hulls",
                     )
                 )
+
+    # Add all points in grey under the "Points" legend group
+    fig.add_trace(
+        go.Scattermapbox(
+            lon=gdf.geometry.x,
+            lat=gdf.geometry.y,
+            mode="markers",
+            marker=dict(size=8, color="grey"),
+            name="Points",
+            legendgroup="Points",
+            showlegend=True,
+        )
+    )
+
+    # Add points colored by cluster under the "Clusters" legend group
+    for cluster_id in clusters_gdf.index:
+        cluster_points = gdf[gdf["cluster"] == cluster_id]
+        fig.add_trace(
+            go.Scattermapbox(
+                lon=cluster_points.geometry.x,
+                lat=cluster_points.geometry.y,
+                mode="markers",
+                marker=dict(size=8, color=f"hsl({cluster_id * 360 / len(clusters_gdf)}, 70%, 50%)"),
+                name=f"Cluster {cluster_id}",
+                legendgroup="Clusters",
+                showlegend=True,
+            )
+        )
 
     # Update the layout for the Mapbox figure
     fig.update_layout(
         mapbox=dict(
             style="open-street-map",
-            zoom=10,
+            zoom=60,
             center=dict(
                 lat=gdf.geometry.y.mean(),
                 lon=gdf.geometry.x.mean(),
