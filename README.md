@@ -1,4 +1,5 @@
 ## Geoclustering
+![workflow status](https://github.com/asecashugo/geoclustering/actions/workflows/python_tests.yml/badge.svg)
 
 Picture this: you have a **massive greenfield** to farm for electricity, be it for your offtaker or or a [P2X project](https://orsted.com/en/what-we-do/renewable-energy-solutions/power-to-x). You need to get the most of it while balancing cost.
 
