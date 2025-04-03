@@ -8,7 +8,8 @@ You will want to:
 
 Only then will you have a foundation to perform detail engineering.
 
-This demo does exactly that:
+This demo does exactly that using [geopandas](https://geopandas.org/en/stable/index.html), [scikit-learn](https://scikit-learn.org/stable/): [clustering](https://scikit-learn.org/stable/modules/clustering.html), [scipy](https://scipy.org/): [Delaunay triangulation](https://en.wikipedia.org/wiki/Delaunay_triangulation), [Dijkstra's algorythm](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm).
+[plotly](https://plotly.com/) for map plotting, [pytest](https://docs.pytest.org/en/stable/) for automated testing in Github Actions
 
 Input:
 
