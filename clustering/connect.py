@@ -397,7 +397,7 @@ def get_centroids_and_trees(gdf: GeoDataFrame, bonus_factor:float=0.95):
             if path["cluster_by_cost_selected_count"] > 0:
                 line_coords = list(path.geometry.coords)
                 fig.add_trace(
-                    go.Scattermapbox(
+                    go.Scattermap(
                         lon=[coord[0] for coord in line_coords],
                         lat=[coord[1] for coord in line_coords],
                         mode="lines",
@@ -420,7 +420,7 @@ def get_centroids_and_trees(gdf: GeoDataFrame, bonus_factor:float=0.95):
 
     # Add the convex hull to the figure
     fig.add_trace(
-        go.Scattermapbox(
+        go.Scattermap(
             lon=[coord[0] for coord in convex_hull.exterior.coords],
             lat=[coord[1] for coord in convex_hull.exterior.coords],
             mode="lines",
@@ -451,7 +451,7 @@ def get_centroids_and_trees(gdf: GeoDataFrame, bonus_factor:float=0.95):
 
             for polygon in polygons:
                 fig.add_trace(
-                    go.Scattermapbox(
+                    go.Scattermap(
                         lon=[coord[0] for coord in polygon.exterior.coords],
                         lat=[coord[1] for coord in polygon.exterior.coords],
                         mode="lines",
@@ -468,7 +468,7 @@ def get_centroids_and_trees(gdf: GeoDataFrame, bonus_factor:float=0.95):
 
     # Add all points in grey under the "Points" legend group
     fig.add_trace(
-        go.Scattermapbox(
+        go.Scattermap(
             lon=gdf.geometry.x,
             lat=gdf.geometry.y,
             mode="markers",
@@ -483,7 +483,7 @@ def get_centroids_and_trees(gdf: GeoDataFrame, bonus_factor:float=0.95):
     for cluster_id in clusters_gdf.index:
         cluster_points = gdf[gdf["cluster"] == cluster_id]
         fig.add_trace(
-            go.Scattermapbox(
+            go.Scattermap(
                 lon=cluster_points.geometry.x,
                 lat=cluster_points.geometry.y,
                 mode="markers",
