@@ -411,7 +411,7 @@ def get_centroids_and_trees(gdf: GeoDataFrame, bonus_factor:float=0.95):
 
     # Calculate the convex hull of all points
     print("Calculating convex hull...")
-    convex_hull = gdf.unary_union.convex_hull
+    convex_hull = gdf.union_all().convex_hull
 
     # Ensure the convex hull is a Polygon
     if convex_hull.geom_type == "Point" or convex_hull.geom_type == "MultiPoint":
