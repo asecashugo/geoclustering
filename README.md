@@ -12,12 +12,12 @@ This demo does exactly that:
 
 Input:
 
-__What a beautiful, windy, sunny creek. I wonder if we could pit it to some use instead of building horrendous luxury villas..._
+__What a beautiful, windy, sunny creek! I wonder if we could put it to some use instead of building horrendous luxury villas..._
 
 ![base 1](https://github.com/user-attachments/assets/5e6d457a-f8bb-4c3b-b082-0bda49cef02c)
 
 
-Base points:
+Base points [geojson](https://en.wikipedia.org/wiki/GeoJSON):
 
 __Here we go, these wind turbines will do fine_
 
