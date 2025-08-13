@@ -565,11 +565,11 @@
         },
         "narwhals": {
             "hashes": [
-                "sha256:235e61ca807bc21110ca36a4d53888ecc22c42dcdf50a7c886e10dde3fd7f38c",
-                "sha256:837457e36a2ba1710c881fb69e1f79ce44fb81728c92ac378f70892a53af8ddb"
+                "sha256:308ec9d0e40616b66b61cd76ede4083a4232ae04942a3acef7e514d49641cb77",
+                "sha256:dee7d7582d456ef325cb831a65b80783041ef841bbf183180ec445d132a154c6"
             ],
             "markers": "python_version >= '3.9'",
-            "version": "==2.0.1"
+            "version": "==2.1.1"
         },
         "numpy": {
             "hashes": [
@@ -822,12 +822,12 @@
         },
         "plotly": {
             "hashes": [
-                "sha256:32c444d4c940887219cb80738317040363deefdfee4f354498cc0b6dab8978bd",
-                "sha256:9dfa23c328000f16c928beb68927444c1ab9eae837d1fe648dbcda5360c7953d"
+                "sha256:7ad806edce9d3cdd882eaebaf97c0c9e252043ed1ed3d382c3e3520ec07806d4",
+                "sha256:8840a184d18ccae0f9189c2b9a2943923fd5cae7717b723f36eef78f444e5a73"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.8'",
-            "version": "==6.2.0"
+            "version": "==6.3.0"
         },
         "pluggy": {
             "hashes": [
